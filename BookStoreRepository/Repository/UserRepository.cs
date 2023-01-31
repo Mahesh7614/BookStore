@@ -14,7 +14,7 @@ namespace BookStoreRepository.Repository
     public class UserRepository : IUserRepository
     {
         private readonly IConfiguration config;
-        private string connectionString;
+        private string? connectionString;
         public UserRepository(IConfiguration configuration, IConfiguration config)
         {
             connectionString = configuration.GetConnectionString("UserDBConnection");
@@ -56,12 +56,12 @@ namespace BookStoreRepository.Repository
             {
                 using (connection)
                 {
-                    SqlCommand command = new SqlCommand("SPRegister", connection);
+                    SqlCommand command = new SqlCommand("SPSignUpUser", connection);
 
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@FirstName", userSignUp.FullName);
-                    command.Parameters.AddWithValue("@LastName", userSignUp.EmailID);
+                    command.Parameters.AddWithValue("@FullName", userSignUp.FullName);
                     command.Parameters.AddWithValue("@EmailID", userSignUp.EmailID);
+                    command.Parameters.AddWithValue("@MobileNumber", userSignUp.MobileNumber);
                     command.Parameters.AddWithValue("@Password", EncryptPassword(userSignUp.Password));
 
                     connection.Open();
@@ -94,7 +94,7 @@ namespace BookStoreRepository.Repository
                 int UserID = 0;
                 using (connection)
                 {
-                    SqlCommand command = new SqlCommand("SPLogin", connection);
+                    SqlCommand command = new SqlCommand("SPLoginUser", connection);
 
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@EmailID", EmailID);
@@ -136,7 +136,7 @@ namespace BookStoreRepository.Repository
 
                 using (connection)
                 {
-                    SqlCommand command = new SqlCommand("SPForgot", connection);
+                    SqlCommand command = new SqlCommand("SPForgotPassword", connection);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@EmailID", emailID);
 
@@ -148,7 +148,7 @@ namespace BookStoreRepository.Repository
                         while (Reader.Read())
                         {
                             userSignUp.UserID = Reader.IsDBNull("UserID") ? 0 : Reader.GetInt32("UserID");
-                            userSignUp.FullName = Reader.IsDBNull("FirstName") ? string.Empty : Reader.GetString("FirstName");
+                            userSignUp.FullName = Reader.IsDBNull("FullName") ? string.Empty : Reader.GetString("FullName");
                         }
                         string token = GenerateJWTToken(emailID, userSignUp.UserID);
                         //MSMQModel mSMQModel = new MSMQModel();
