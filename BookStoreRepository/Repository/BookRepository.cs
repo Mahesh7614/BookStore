@@ -3,19 +3,16 @@ using BookStoreModel;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data;
-using static System.Reflection.Metadata.BlobBuilder;
 using BookStoreRepository.Interface;
 
 namespace BookStoreRepository.Repository
 {
     public class BookRepository : IBookRepository
     {
-        //private readonly IConfiguration config;
         private string? connectionString;
-        public BookRepository(IConfiguration configuration, IConfiguration config)
+        public BookRepository(IConfiguration configuration)
         {
             connectionString = configuration.GetConnectionString("UserDBConnection");
-           // this.config = config;
         }
         public BookModel AddBook(BookModel bookModel)
         {
