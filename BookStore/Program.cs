@@ -22,6 +22,8 @@ namespace BookStore
             builder.Services.AddTransient<IUserManager, UserManager>();
             builder.Services.AddTransient<IBookRepository, BookRepository>();
             builder.Services.AddTransient<IBookManager, BookManager>();
+            builder.Services.AddTransient<IAdminManager, AdminManager>();
+            builder.Services.AddTransient<IAdminRepository, AdminRepository>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(s =>

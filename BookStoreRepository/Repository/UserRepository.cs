@@ -35,6 +35,7 @@ namespace BookStoreRepository.Repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
+                        new Claim(ClaimTypes.Role,"User"),
                         new Claim(ClaimTypes.Email, emailID),
                         new Claim("UserID",UserID.ToString())
                     }),

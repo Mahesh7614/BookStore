@@ -1,5 +1,6 @@
 ﻿using BookStoreManager.Interface;
 using BookStoreModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers
@@ -13,6 +14,7 @@ namespace BookStore.Controllers
         {
             this.bookManager = bookManager;
         }
+        [Authorize(Roles = Role.Admin)]
         [HttpPost]
         [Route("BookStore/AddBook")]
         public IActionResult AddBook(BookModel bookModel)
@@ -31,13 +33,14 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }
+        [Authorize(Roles = Role.Admin)]
         [HttpPut]
         [Route("BookStore/UpdateBook")]
-        public IActionResult UpdateBook(BookModel bookModel)
+        public IActionResult UpdateBook(int BookID,BookModel bookModel )
         {
             try
             {
-                BookModel bookData = this.bookManager.UpdateBook(bookModel);
+                BookModel bookData = this.bookManager.UpdateBook(BookID, bookModel);
                 if (bookData != null)
                 {
                     return this.Ok(new { success = true, message = "Book Updated Successfully", result = bookData });
@@ -49,6 +52,7 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }
+        [Authorize(Roles = Role.Admin)]
         [HttpDelete]
         [Route("BookStore/DeleteBook")]
         public IActionResult DeleteBook(int BookID)
@@ -67,6 +71,7 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }
+        [Authorize]
         [HttpGet]
         [Route("BookStore/GetAllBook")]
         public IActionResult GetAllBook()
@@ -85,6 +90,7 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }
+        [Authorize(Roles = Role.User)]
         [HttpGet]
         [Route("BookStore/GetBookByID")]
         public IActionResult GetBookByID(int BookID)

@@ -70,7 +70,7 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = Role.User)]
         [HttpPut]
         [Route("BookStore/ResetPassword")]
         public IActionResult ResetPassword(string password, string confirmPassword)

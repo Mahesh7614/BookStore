@@ -59,7 +59,7 @@ namespace BookStoreRepository.Repository
                 }
             }
         }
-        public BookModel UpdateBook(BookModel bookModel)
+        public BookModel UpdateBook( int BookID, BookModel bookModel)
         {
             SqlConnection connection = new SqlConnection(connectionString);
             try
@@ -69,7 +69,7 @@ namespace BookStoreRepository.Repository
                     SqlCommand command = new SqlCommand("SPUpdateBook", connection);
 
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@BookID", bookModel.BookID);
+                    command.Parameters.AddWithValue("@BookID", BookID);
                     command.Parameters.AddWithValue("@BookName", bookModel.BookName);
                     command.Parameters.AddWithValue("@AuthorName", bookModel.AuthorName);
                     command.Parameters.AddWithValue("@Ratings", bookModel.Ratings);
