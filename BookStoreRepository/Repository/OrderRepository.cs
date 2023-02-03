@@ -7,32 +7,34 @@ using BookStoreRepository.Interface;
 
 namespace BookStoreRepository.Repository
 {
-    public class WishlistRepository : IWishlistRepository
+    public class OrderRepository : IOrderRepository
     {
         private string? connectionString;
-        public WishlistRepository(IConfiguration configuration)
+        public OrderRepository(IConfiguration configuration)
         {
             connectionString = configuration.GetConnectionString("UserDBConnection");
         }
-        public WishlistModel AddToWishlist(WishlistModel wishlistModel)
+        public PlaceOrderModel PlaceOrder(PlaceOrderModel placeOrderModel)
         {
             SqlConnection connection = new SqlConnection(connectionString);
             try
             {
                 using (connection)
                 {
-                    SqlCommand command = new SqlCommand("SPAddWishlist", connection);
+                    SqlCommand command = new SqlCommand("SPPlaceOrder", connection);
 
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@BookID", wishlistModel.BookID);
-                    command.Parameters.AddWithValue("@UserID", wishlistModel.UserID);
+                    command.Parameters.AddWithValue("@UserID", placeOrderModel.UserID);
+                    command.Parameters.AddWithValue("@CartID", placeOrderModel.CartID);
+                    command.Parameters.AddWithValue("@AddressID", placeOrderModel.AddressID);
+                    command.Parameters.AddWithValue("@Date_Time", DateTime.Now);
 
                     connection.Open();
                     int AddOrNot = command.ExecuteNonQuery();
 
                     if (AddOrNot >= 1)
                     {
-                        return wishlistModel;
+                        return placeOrderModel;
                     }
                     return null;
                 }
@@ -49,50 +51,15 @@ namespace BookStoreRepository.Repository
                 }
             }
         }
-        public bool DeleteWishlist(int WishlistID, int UserID)
+        public List<GetOrdersModel> GetAllOrders(int UserID)
         {
             SqlConnection connection = new SqlConnection(connectionString);
             try
             {
+                List<GetOrdersModel> orders = new List<GetOrdersModel>();
                 using (connection)
                 {
-                    SqlCommand command = new SqlCommand("SPDeleteWishlist", connection);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@WishlistID", WishlistID);
-                    command.Parameters.AddWithValue("@UserID", UserID);
-
-                    connection.Open();
-                    int DeleteOrNot = command.ExecuteNonQuery();
-
-                    if (DeleteOrNot >= 1)
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
-        }
-        public List<WishlistModel> GetAllWishlist(int UserID)
-        {
-            SqlConnection connection = new SqlConnection(connectionString);
-            try
-            {
-                List<WishlistModel> wishlist = new List<WishlistModel>();
-                using (connection)
-                {
-                    SqlCommand command = new SqlCommand("SPGetAllWishlist", connection);
+                    SqlCommand command = new SqlCommand("SPGetAllOrders", connection);
 
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@UserID", UserID);
@@ -105,18 +72,56 @@ namespace BookStoreRepository.Repository
                     {
                         while (Reader.Read())
                         {
-                            WishlistModel book = new WishlistModel()
+                            GetOrdersModel order = new GetOrdersModel()
                             {
-                                WishlistID = Reader.IsDBNull("WishlistID") ? 0 : Reader.GetInt32("WishlistID"),
-                                BookID = Reader.IsDBNull("BookID") ? 0 : Reader.GetInt32("BookID"),
+                                OrderID = Reader.IsDBNull("OrderID") ? 0 : Reader.GetInt32("OrderID"),
+                                CartID = Reader.IsDBNull("CartID") ? 0 : Reader.GetInt32("CartID"),
+                                AddressID = Reader.IsDBNull("AddressID") ? 0 : Reader.GetInt32("AddressID"),
+                                Total_Price = Reader.IsDBNull("Total_Price") ? 0 : Reader.GetInt32("Total_Price"),
+                                Date_Time = Reader.IsDBNull("Date_Time") ? DateTime.MinValue : Reader.GetDateTime("Date_Time"),
                                 UserID = Reader.IsDBNull("UserID") ? 0 : Reader.GetInt32("UserID"),
 
                             };
-                            wishlist.Add(book);
+                            orders.Add(order);
                         }
-                        return wishlist;
+                        return orders;
                     }
                     return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public bool DeleteOrder(int OrderID, int UserID)
+        {
+            SqlConnection connection = new SqlConnection(connectionString);
+            try
+            {
+                using (connection)
+                {
+                    SqlCommand command = new SqlCommand("SPDeleteOrder", connection);
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@OrderID", OrderID);
+                    command.Parameters.AddWithValue("@UserID", UserID);
+
+                    connection.Open();
+                    int DeleteOrNot = command.ExecuteNonQuery();
+
+                    if (DeleteOrNot >= 1)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
             }
             catch (Exception ex)

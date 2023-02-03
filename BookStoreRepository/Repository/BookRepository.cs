@@ -35,9 +35,9 @@ namespace BookStoreRepository.Repository
                     command.Parameters.AddWithValue("@Book_Quantity", bookModel.Book_Quantity);
 
                     connection.Open();
-                    int registerOrNot = command.ExecuteNonQuery();
+                    int AddOrNot = command.ExecuteNonQuery();
 
-                    if (registerOrNot >= 1)
+                    if (AddOrNot >= 1)
                     {
                         return bookModel;
                     }
@@ -78,9 +78,9 @@ namespace BookStoreRepository.Repository
                     command.Parameters.AddWithValue("@Book_Quantity", bookModel.Book_Quantity);
 
                     connection.Open();
-                    int registerOrNot = command.ExecuteNonQuery();
+                    int UpdateOrNot = command.ExecuteNonQuery();
 
-                    if (registerOrNot >= 1)
+                    if (UpdateOrNot >= 1)
                     {
                         return bookModel;
                     }
@@ -112,9 +112,9 @@ namespace BookStoreRepository.Repository
                     command.Parameters.AddWithValue("@BookID", BookID);
 
                     connection.Open();
-                    int registerOrNot = command.ExecuteNonQuery();
+                    int DeleteOrNot = command.ExecuteNonQuery();
 
-                    if (registerOrNot >= 1)
+                    if (DeleteOrNot >= 1)
                     {
                         return true;
                     }
