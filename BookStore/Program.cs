@@ -38,7 +38,7 @@ namespace BookStore
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(s =>
             {
-                s.SwaggerDoc("v1", new OpenApiInfo { Title = "Welcome to FundoNotes" });
+                s.SwaggerDoc("v1", new OpenApiInfo { Title = "Welcome to Book Store" });
                 var jwtSecurityScheme = new OpenApiSecurityScheme
                 {
                     Scheme = "bearer",
