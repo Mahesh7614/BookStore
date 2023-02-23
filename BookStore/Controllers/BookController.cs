@@ -2,6 +2,9 @@
 using BookStoreModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace BookStore.Controllers
 {
@@ -10,9 +13,11 @@ namespace BookStore.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookManager bookManager;
-        public BookController(IBookManager bookManager)
+        private readonly IDistributedCache distributedCache;
+        public BookController(IBookManager bookManager, IDistributedCache distributedCache)
         {
             this.bookManager = bookManager;
+            this.distributedCache = distributedCache;
         }
         [Authorize(Roles = Role.Admin)]
         [HttpPost]
@@ -36,7 +41,7 @@ namespace BookStore.Controllers
         [Authorize(Roles = Role.Admin)]
         [HttpPut]
         [Route("BookStore/UpdateBook")]
-        public IActionResult UpdateBook(int BookID,BookModel bookModel )
+        public IActionResult UpdateBook(int BookID, BookModel bookModel)
         {
             try
             {
@@ -107,6 +112,36 @@ namespace BookStore.Controllers
             catch (Exception ex)
             {
                 return this.BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("GetAllBooksUsingRadisCache")]
+        public async Task<IActionResult> GetAllNotesUsingRadis()
+        {
+            try
+            {
+                var cacheKey = "BooksList";
+                List<BookModel> noteList;
+                byte[] redisNoteList = await this.distributedCache.GetAsync(cacheKey);
+                if (redisNoteList != null)
+                {
+                    var serializedNoteList = Encoding.UTF8.GetString(redisNoteList);
+                    noteList = JsonConvert.DeserializeObject<List<BookModel>>(serializedNoteList);
+                }
+                else
+                {
+                    noteList = this.bookManager.GetAllBook();
+                    var serializedNoteList = JsonConvert.SerializeObject(noteList);
+                    var newRedisNoteList = Encoding.UTF8.GetBytes(serializedNoteList);
+                    var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddMinutes(10)).SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                    await this.distributedCache.SetAsync(cacheKey, newRedisNoteList, options);
+                }
+
+                return this.Ok(noteList);
+            }
+            catch (Exception ex)
+            {
+                return this.BadRequest(new { sucess = false, message = ex.Message });
             }
         }
     }

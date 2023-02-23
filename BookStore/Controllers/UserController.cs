@@ -11,10 +11,12 @@ namespace BookStore.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserManager userManager;
+        private readonly ILogger logger;
 
-        public UserController(IUserManager userManager)
+        public UserController(IUserManager userManager, ILogger logger)
         {
             this.userManager = userManager;
+            this.logger = logger;
         }
         [HttpPost]
         [Route("BookStore/SignUp")]
@@ -25,12 +27,15 @@ namespace BookStore.Controllers
                 UserSignUpModel registrationData = this.userManager.SignUp(userSignUp);
                 if (registrationData != null)
                 {
+                    logger.LogInformation("Registration Successfull");
                     return this.Ok(new { success = true, message = "Registration Successfull", result = registrationData });
                 }
-                return this.Ok(new { success = true, message = "User Already Exists" });
+                logger.LogError("Registration not Successfull");
+                return this.BadRequest(new { success = true, message = "User Already Exists" });
             }
             catch (Exception ex)
             {
+                logger.LogCritical("Getting an Exception in SignUp");
                 return this.BadRequest(new { success = false, message = ex.Message });
             }
         }

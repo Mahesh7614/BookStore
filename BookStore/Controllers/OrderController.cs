@@ -3,7 +3,6 @@ using BookStoreManager.Interface;
 using BookStoreModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace BookStore.Controllers
 {
